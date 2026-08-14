@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letters to the Greatest Man Who Ever Lived</title>
+    <!-- Google Fonts for cute & readable typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library for cute celebratory effects -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Floating Background Elements (Hearts, Stars, Clouds) -->
+    <div id="vanta-bg"></div>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+    <!-- Vanta Fog -->
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
+
+
+
+    <div class="app-container">
+        <!-- Header / Hero Section -->
+
+
+        <script type="module">
+            import { balloons, textBalloons } from "https://cdn.jsdelivr.net/npm/balloons-js@0.0.3/+esm";
+            balloons();
+        </script>
+
+
+
+        <header class="hero-section">
+            <div class="hero-image-wrapper">
+                <img src="images/papa5.jpeg" alt="Greatest Dad Illustration" class="hero-image">
+            </div>
+            <h1 class="hero-title">Letters to the Greatest Man Who Ever Lived</h1>
+            <p class="hero-subtitle">Happy birthday goat. Here is a corner of the internet made just for you by your awesome daughter. I love you!</p>
+            </div>
+        </header>
+
+        <!-- Letters Section -->
+        <section class="section letters-section">
+            <div id="lock-status-bar">
+                <span class="status-badge locked"><i class="fa-solid fa-lock"></i> Letters Locked</span>
+            </div>
+            <h2 class="section-title"><i class="fa-solid fa-envelope-heart"></i> Letters For You</h2>
+            <p class="section-desc">Click on an envelope below matching how you feel right now. It's password protected!</p>
+            
+            <div class="letters-grid">
+                <div class="envelope-card" onclick="openLetter('happy')">
+                    <div class="envelope-gif-wrapper">
+                        <img
+                            class="envelope-static"
+                            src="images/Letter.png"
+                            alt="Happy envelope"
+                        >
+                        <img
+                            class="envelope-gif"
+                            src="images/letter gif.gif"
+                            alt=""
+                        >
+                    </div>
+                    <span class="envelope-label">When you're happy</span>
+                </div>
+
+                <!-- Sad Envelope -->
+                <div class="envelope-card" onclick="openLetter('sad')">
+                    <div class="envelope-gif-wrapper">
+                        <img
+                            class="envelope-static"
+                            src="images/Letter.png"
+                            alt="Happy envelope"
+                        >
+                        <img
+                            class="envelope-gif"
+                            src="images/letter gif.gif"
+                            alt=""
+                        >
+                    </div>
+                    <span class="envelope-label">When you're sad</span>
+                </div>
+
+                <div class="letters-center-heart"
+     onclick="openLetter('mom')"
+     role="button"
+     tabindex="0"
+     aria-label="Open a letter from Mom">
+
+    <img
+        class="heart-static"
+        src="images/heart image.png"
+        alt="Letter from Mom"
+    >
+
+    <img
+        class="heart-gif"
+        src="images/heart slow gif.gif"
+        alt=""
+    >
+
+    <span class="heart-label">One from your beautiful wife</span>
+</div>
+
+                <!-- Proud Envelope -->
+                <div class="envelope-card" onclick="openLetter('proud')">
+                    <div class="envelope-gif-wrapper">
+                        <img
+                            class="envelope-static"
+                            src="images/Letter.png"
+                            alt="Happy envelope"
+                        >
+                        <img
+                            class="envelope-gif"
+                            src="images/letter gif.gif"
+                            alt=""
+                        >
+                    </div>
+                    <span class="envelope-label">When you miss me</span>
+                </div>
+
+                <!-- Not Appreciated Envelope -->
+                <div class="envelope-card" onclick="openLetter('not-appreciated')">
+                    <div class="envelope-gif-wrapper">
+                        <img
+                            class="envelope-static"
+                            src="images/Letter.png"
+                            alt="Happy envelope"
+                        >
+                        <img
+                            class="envelope-gif"
+                            src="images/letter gif.gif"
+                            alt=""
+                        >
+                    </div>
+                    <span class="envelope-label">When you dont feel appreciated enough</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scrapbook Teaser Section -->
+        <section class="section scrapbook-teaser-section">
+            <h2 class="section-title"><i class="fa-solid fa-book-heart"></i> A Little Book of Love</h2>
+            <p class="section-desc">You spent a lifetime being there for everyone. Today, everyone has something to say to you.</p>
+            <div class="scrapbook-open-btn-wrap">
+                <a href="scrapbook.html" class="scrapbook-open-btn">
+                    <i class="fa-solid fa-book-open"></i> Open the Scrapbook
+                </a>
+            </div>
+        </section>
+
+        <!-- Polaroid Photo Gallery Section -->
+        <section class="section gallery-section">
+            <h2 class="section-title">Memory Lane</h2>
+            <p class="section-desc">Click any photo to see it full size!</p>
+            
+            <div class="polaroid-grid">
+                <!-- Polaroid 1 -->
+                <div class="polaroid-card" onclick="openLightbox('images/papa3.png', 'The World\'s Best Dad!')">
+                    <div class="polaroid-image-container">
+                        <img src="images/papa3.png" alt="Best Dad Memory">
+                    </div>
+                    <p class="polaroid-caption">Super Hero</p>
+                </div>
+
+                <!-- Polaroid 2 -->
+                <div class="polaroid-card tilt-left" onclick="openLightbox('images/papa2.jpeg', 'hehe young papa')">
+                    <div class="polaroid-image-container">
+                        <img src="images/papa6.jpeg" alt="Family Hug Memory">
+                    </div>
+                    <p class="polaroid-caption">So Young</p>
+                </div>
+
+                <!-- Polaroid 3 -->
+                <div class="polaroid-card tilt-right" onclick="openLightbox('images/papa4.png')">
+                    <div class="polaroid-image-container">
+                        <img src="images/papa4.png" alt="Relaxing Dad Memory">
+                    </div>
+                    <p class="polaroid-caption">Mogger</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Made with all the love in the world</p>
+            <p class="footer-sub">For the Greatest Father ever</p>
+            <div class="footer-controls">
+                <button class="lock-btn" id="lock-btn" onclick="toggleLockState()"><i class="fa-solid fa-lock"></i> Lock Letters</button>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Modals Section -->
+
+    <!-- Passcode Modal -->
+    <div id="passcode-modal" class="modal-overlay">
+        <div class="modal-container passcode-modal-content">
+            <button class="modal-close-btn" onclick="closeModal('passcode-modal')">&times;</button>
+            <div class="lock-icon-wrapper">
+                <i class="fa-solid fa-lock-keyhole animated-lock"></i>
+            </div>
+            <h2>Enter the Secret Code</h2>
+            <p class="passcode-prompt">To read Dad's letters, please enter the secret password!</p>
+            <div class="passcode-input-wrapper">
+                <input type="password" id="passcode-input" placeholder="Type secret code here..." onkeydown="checkPasscodeOnEnter(event)">
+                <button class="submit-passcode-btn" onclick="verifyPasscode()">Unlock</button>
+            </div>
+            <div class="hint-container">
+                <span class="hint-trigger" onclick="toggleHint()"><i class="fa-solid fa-circle-question"></i> Need a hint?</span>
+                <p id="hint-text" class="hint-text hidden">Hint: Please check whatsapp >_<</p>
+            </div>
+            <div class="error-msg" id="passcode-error">Oops! That's not the secret code. Try again!</div>
+        </div>
+    </div>
+
+    <!-- Letter Reading Modal -->
+    <div id="letter-modal" class="modal-overlay">
+        <div class="modal-container letter-paper">
+            <button class="modal-close-btn" onclick="closeModal('letter-modal')">&times;</button>
+            <div class="letter-stamp"><i class="fa-solid fa-heart"></i></div>
+            <div class="letter-content-wrapper">
+                <h2 id="letter-title" class="letter-title">Dearest Dad,</h2>
+                <div id="letter-body" class="letter-body">
+                    <!-- Dynamic Letter Content will load here -->
+                </div>
+                <div class="letter-sign-off">
+                    <p>With endless love,</p>
+                    <p class="handwritten-signature" id="letter-signature">Your Loving Family â¤ï¸</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal for Photo Gallery -->
+    <div id="lightbox-modal" class="modal-overlay" onclick="closeLightboxOverlay(event)">
+        <div class="lightbox-container">
+            <button class="modal-close-btn lightbox-close" onclick="closeModal('lightbox-modal')">&times;</button>
+            <img id="lightbox-img" class="lightbox-img" src="" alt="Zoomed memory">
+        </div>
+    </div>
+
+    <!-- Inject Javascript -->
+    <script src="script.js"></script>
+</body>
+</html>

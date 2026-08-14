@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Little Book of Love</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Fredoka:wght@400;600;700&family=Kalam:wght@300;400;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #1c120a;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        /* =========================================================
+           BACK BUTTON
+        ========================================================= */
+        .back-btn {
+            position: fixed;
+            top: 16px; left: 16px;
+            z-index: 9999;
+            display: inline-flex;
+            align-items: center;
+            background:#BB9672;
+            color: #ffff;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 50px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.3);
+            transition: all 0.25s ease;
+        }
+        .back-btn:hover {
+            background: #ff758f;
+            color: #fff;
+            transform: translateX(-3px);
+        }
+
+        /* =========================================================
+           COVER SCREEN
+        ========================================================= */
+        #cover-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+                        opacity 0.8s ease 0.4s;
+            transform-origin: left center;
+            perspective: 2500px;
+        }
+
+        /* Swoosh away: book cover opens */
+        #cover-screen.swoosh-away {
+            transform: rotateY(-110deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+        }
+
+        /* Gradient overlay so button is readable */
+        .cover-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                transparent 40%,
+                rgba(0,0,0,0.55) 100%
+            );
+        }
+
+        .tap-to-open-btn {
+            position: absolute;
+            bottom: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #BB9672;
+            color: #ffff;
+            border: none;
+            padding: 12px 28px; /* Reduced from 16px 40px */
+            border-radius: 60px;
+            font-family: 'ComicCat', serif;
+            font-size: 1rem; /* Reduced from 1.2rem */
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            animation: gentlePulse 2.2s ease-in-out infinite;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* =========================================================
+           NOTEBOOK SCREEN  (hidden until cover swooshes away)
+        ========================================================= */
+        #notebook-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, #3a2510 0%, #1c120a 100%);
+
+            /* Starts hidden below  */
+            opacity: 0;
+            transform: scale(0.92) translateY(40px);
+            transition: opacity 0.6s ease 0.55s,
+                        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.55s;
+            pointer-events: none;
+        }
+        #notebook-screen.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ---- NAV ARROWS ---- */
+        .nb-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 200;
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.88);
+            border: none;
+            font-size: 1.15rem;
+            color: #6a3800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            transition: all 0.22s ease;
+        }
+        .nb-arrow:hover {
+            background: #ff758f;
+            color: #fff;
+            transform: translateY(-50%) scale(1.12);
+        }
+        .nb-arrow:disabled {
+            opacity: 0.18;
+            pointer-events: none;
+        }
+        .nb-arrow.prev { left: 14px; }
+        .nb-arrow.next { right: 14px; }
+
+        @media (min-width: 720px) {
+            .nb-arrow.prev { left: 28px; }
+            .nb-arrow.next { right: 28px; }
+        }
+
+        /* ---- PAGE COUNTER ---- */
+        .page-counter {
+            position: fixed;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            background: rgba(0,0,0,0.28);
+            padding: 4px 16px;
+            border-radius: 50px;
+            pointer-events: none;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================================
+           THE NOTEBOOK BOOK
+        ========================================================= */
+        .notebook-wrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 80px;
+        }
+
+        .notebook {
+            position: relative;
+            width: 100%;
+            max-width: 660px;
+            height: min(86vh, 800px);
+            display: flex;
+            border-radius: 8px;
+            box-shadow: 0 14px 60px rgba(0,0,0,0.65), 0  4px 14px rgba(0,0,0,0.4);
+            overflow: hidden;
+            background: url('images/digital notes page.jpg') center/100% 100% no-repeat;
+        }
+
+        /* ---- PAGES CONTAINER ---- */
+        .pages-wrap {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            perspective: 2500px;
+        }
+
+        /* Notebook paper lines + red margin */
+        .page {
+            position: absolute;
+            inset: 0;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            background: transparent;
+
+            /* Page turn: hinge on left, open to right */
+            transform-origin: left center;
+            transform: rotateY(90deg);
+            transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: rotateY(0deg);
+        }
+
+        .page.exit-left {
+            opacity: 0;
+            transform: rotateY(-90deg);
+        }
+
+        /* Subtle scrollbar */
+        .page::-webkit-scrollbar { width: 5px; }
+        .page::-webkit-scrollbar-track { background: transparent; }
+        .page::-webkit-scrollbar-thumb {
+            background: rgba(180, 120, 50, 0.28);
+            border-radius: 10px;
+        }
+
+        /* ---- PAGE CONTENT ---- */
+        .page-content {
+            padding: 50px 40px 50px 50px;
+            line-height: 32px;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .p-from {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #8b3a10;
+            line-height: 32px;
+        }
+
+        .p-date {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #c0a080;
+            line-height: 32px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .p-body {
+            font-family: 'Kalam', cursive;
+            font-size: 1.52rem;
+            line-height: 32px;
+            color: #1e1208;
+            white-space: pre-line;
+            margin-bottom: 12px;
+        }
+
+        .p-sig {
+            font-family: 'Kalam', cursive;
+            font-size: 1.42rem;
+            font-weight: 700;
+            color: #8b3a10;
+            line-height: 32px;
+        }
+
+        .p-doodle {
+            font-family: 'Kalam', cursive;
+            font-size: 1.1rem;
+            letter-spacing: 7px;
+            color: #c04060;
+            opacity: 0.45;
+            line-height: 32px;
+        }
+
+        .p-divider {
+            text-align: center;
+            letter-spacing: 10px;
+            font-size: 0.78rem;
+            color: #c0a060;
+            opacity: 0.4;
+            line-height: 32px;
+            margin: 2px 0;
+        }
+
+        .p-spacer { line-height: 32px; display: block; }
+
+        .p-closing {
+            margin-top: 28px;
+            text-align: center;
+            font-family: 'Kalam', cursive;
+            font-size: 1.15rem;
+            color: #8a5020;
+            opacity: 0.6;
+            line-height: 32px;
+        }
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+        @media (max-width: 600px) {
+            .notebook-wrap { padding: 12px 24px; }
+
+            .notebook {
+                max-width: 100%;
+                height: min(91vh, 700px);
+                border-radius: 8px;
+            }
+
+            .page-content {
+                padding: 40px 20px 40px 24px;
+                line-height: 30px;
+            }
+
+            .page {
+                background: transparent;
+            }
+
+            .p-body { font-size: 1.28rem; line-height: 30px; }
+            .p-from, .p-date, .p-sig, .p-doodle,
+            .p-divider, .p-closing { line-height: 30px; }
+
+            .nb-arrow       { width: 40px; height: 40px; font-size: 1rem; }
+            .nb-arrow.prev  { left: 6px; }
+            .nb-arrow.next  { right: 6px; }
+
+            .tap-to-open-btn { font-size: 1.05rem; padding: 14px 28px; }
+            .back-btn { font-size: 0.82rem; padding: 8px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Back link -->
+    <a class="back-btn" href="index.html">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+
+    <!-- ============================================================
+         COVER
+    ============================================================ -->
+    <div id="cover-screen">
+        <img src="images/download (2).jpg" alt="A Little Book of Love" class="cover-img">
+        <div class="cover-overlay"></div>
+        <button class="tap-to-open-btn" id="tap-btn" onclick="openBook()">
+            Tap to open
+        </button>
+    </div>
+
+    <!-- ============================================================
+         NOTEBOOK
+    ============================================================ -->
+    <div id="notebook-screen">
+
+        <button class="nb-arrow prev" id="btn-prev" onclick="prevPage()" disabled>
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button class="nb-arrow next" id="btn-next" onclick="nextPage()">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <div class="page-counter" id="counter">1 / 6</div>
+
+        <div class="notebook-wrap">
+            <div class="notebook">
+                <!-- Pages Container -->
+                <div class="pages-wrap" id="pages-container">
+                    <!-- Pages will be generated here by JavaScript -->
+                </div>
+            </div><!-- end notebook -->
+        </div><!-- end notebook-wrap -->
+    </div><!-- end notebook-screen -->
+
+    <script>
+        // ADD YOUR 26 NOTES HERE!
+        // Just copy/paste one of these blocks for each note. No need to touch HTML again.
+        const NOTES = [
+            {
+    text: "“The ultimate Anil Kapoor of the family.”",
+    sig: "— Kunal Deshpande",
+    doodle: ""
+},{
+    text: "Amol Deshpande is the kind of friend everyone hopes to have—genuine, dependable, and always ready to lend a helping hand. He stands by his friends in both good times and difficult moments, offering thoughtful advice, unwavering support, and sincere encouragement.\n\nHis warm nature, positive attitude, and sense of humor make every interaction enjoyable. Whether at work or in personal life, Amol values relationships and treats everyone with respect and kindness. As a friend, he is trustworthy, compassionate, and someone who leaves a lasting impression through his humility and caring heart.",
+    sig: "— Pandey",
+    doodle: ""
+},
+{
+    text: "Amol and I have been friends for many years, and our friendship has only grown stronger with time. We’ve shared so many good memories, supported each other through different phases of life, and always been there for one another. I’m truly grateful to have a friend like Amol in my life.\n\nMy best wishes are always with him.",
+    sig: "— Guleria",
+    doodle: ""
+},
+{
+    text: "Amol, it’s been a wonderful journey knowing you over the years—as a friend, best colleague, and eventually like a younger brother. We’ve shared many memories, laughter, and good times together.\n\nWishing you a very Happy Birthday and many more happy, successful years ahead!",
+    sig: "— D K Gautam",
+    doodle: ""
+},
+{
+    text: "Happy Birthday to an absolutely wonderful person!\n\nYou’re not just a great friend, but also an amazing parent, a brilliant problem-solver, and of course, a fantastic cook! Your love for travelling makes you even more fun to be around, always bringing new stories and experiences along the way.\n\nWishing you a birthday filled with happiness, laughter, good food, wonderful journeys, and everything you truly deserve. May the year ahead bring you many more adventures, beautiful memories, and reasons to smile.\n\nHave a fantastic birthday and an even more amazing year ahead!",
+    sig: "— Mishra",
+    doodle: ""
+},
+
+            {
+                text: "Happy Birthday, dear Aama\n\nLife is more beautiful and stronger because you are always there.\nA brother like you is one of life’s greatest blessings.\nMay you always stay happy, healthy, and successful.\nNo matter where life takes us, you will always have a special place in my heart.\n\nHappy Birthday, Aama",
+                sig: "- Ram Deshpande",
+                doodle: "♡ ♡ ♡"
+            },
+            {
+    text: "You are not just my elder brother; you are our family’s strength, protector, guide, and forever-support system. Having someone like you in our lives is truly a blessing!!, wishing you a very happy birthday, bro!!",
+    sig: "— Shyam Deshpande",
+    doodle: "♡ ♡ ♡"
+},
+            {
+    text: "Wishing a very Happy Birthday to the ultimate problem-solver!\n\nThanks Bhau for always being ready to jump in and save the day whenever needed. Have a wonderful birthday—you deserve the best!",
+    sig: "— Jalaj Chaturvedi",
+    doodle: "♡ ♡ ♡"
+},
+{
+    font: "kalam", 
+    text: "जब संकटे याती सब दरवाजे बंद होते उस टाइम अमोलका दरवाजा खुला होता सबके पीछे खडा मिलता",
+    sig: "— Mana Deshpande",
+    doodle: "♡ ♡ ♡"
+},
+            {
+    text: "Happy birthday to my dear younger brother. Wishing you a very very happy birthday filled with happiness, good health, success and countless beautiful moments. You have always been very special to me. We have shared a lot of memories since we were young and I truly cherish the bond we share. May all your dreams come true and may the coming years bring you peace, prosperity, good health and more reasons to smile. Happy birthday, dear Amol. Stay blessed, stay happy and keep shining. Happy Birthday!",
+    sig: "— Vijay Deshpande",
+    doodle: "♡ ♡ ♡"
+},
+{
+    font: "kalam", 
+    text: "काही नाती रक्ताची नसतात, पण तरीही ती रक्ताच्या नात्यांपेक्षा कितीतरी जास्त जवळची असतात… माझ्यासाठी तुमचं नातं अगदी तसंच आहे.\n\nमनातल्या अशा कितीतरी गोष्टी आहेत, ज्या प्रत्येकाला सांगता येत नाहीत, कधी शब्दांतही मांडता येत नाहीत… पण त्या गोष्टी तुमच्याशी मात्र अगदी सहज बोलता येतात. कारण तुमच्याशी बोलताना मनात कुठलाही संकोच राहत नाही, उलट मन हलकं होतं.\n\nतुम्ही माझ्यासाठी सख्या भावापेक्षाही जास्त जवळचे, विश्वासाचे आणि मनापासून आपले आहात. तुमच्यावरचा हा विश्वास आणि तुमच्याशी असलेलं हे नातं माझ्यासाठी खरंच खूप खास आहे.",
+    sig: "— तुमचीच Radha",
+    doodle: "♡ ♡ ♡"
+},
+            {
+                font: "kalam", 
+                text: "Happy Birthday साहिब हमेशा खुश रहें, स्वस्थ रहें और यूँ ही महाराष्ट्र की शान बने रहें",
+                sig: "- Aashish Chaturvedi"
+            },
+            {
+    text: "Happiest birthday Amol….. God bless you always with good health nd happiness nd prosperity",
+    sig: "— Vandana Chaturvedi",
+    doodle: "♡ ♡ ♡"
+},
+            {
+                text: "Amol bhauji is a big support for our family",
+                sig: "- Anjali Deshpande",
+                divider: "✦ ✦ ✦"
+            },
+            {
+    text: "Happy Birthday Mausaji.\n\nMany more years to come. Thank you for motivating and supporting me always.\n\nNew Parliament Tour is due",
+    sig: "— Aashu",
+    doodle: ""
+},
+            {
+    text: "You have always been much more than just an uncle to me. You are someone I deeply respect, love, and feel truly blessed to have in my life.\n\nYour kindness, warmth, simplicity, and the love you have for your family make you a truly special person. The beautiful family you have built and the values you have passed on are a reflection of the wonderful person you are.\n\nI will always cherish the memories, laughter, conversations, and countless little moments we have shared. As the years go by, I realize even more how precious these relationships are.\n\nKaka, I feel lucky and proud to call you my Amol Kaka.\n\nMay you always be blessed with good health, happiness, peace, and countless reasons to smile. May the years ahead be filled with beautiful memories and the love of everyone who holds you close to their heart.\n\nWith lots of love, respect, and warm wishes,",
+    sig: "— Your Son, Sagar",
+    doodle: "♡ ♡ ♡"
+},
+{
+    text: "Happy Birthday, Dearest Amol Kaka!\n\nThank you for teaching me English in the easiest and most encouraging way. I still remember your little tasks — “learn 5 new words today”, “make a sentence from each”, and “tell me about your day in English”. Because of you, I became fearless, fluent, and confident. You were always patient, celebrated my small wins, and never let me give up.\n\nAnd then, there are your wonderful travel and childhood stories! From your early Delhi days to your adventures, travels, pranks, firecracker timebombs, and Holika Dahan memories — every story made us laugh and see the fun, curious, full-of-life person you have always been.\n\nKaka, you taught me language, curiosity, confidence, and most importantly, how to enjoy life. I pray God blesses you with great health, happiness, countless adventures, and many more stories to share with us.\n\nHappy Birthday, Amol Kaka!",
+    sig: "— Abhilasha (Billu Vakil)",
+    doodle: "♡ ♡ ♡"
+},
+{
+    text: "Amol Kaka, you are truly such a kind-hearted and caring person. I still remember how, during my wedding, you helped my grandfather get down from the stage, even though you barely knew me. That small gesture touched my heart and showed me the beautiful person you are.\n\nLater, when you sent me a cake on my birthday, it made me feel so special. These little gestures mean a lot and will always stay close to my heart.\n\nI feel lucky to have you not just as my father-in-law, but as someone I genuinely respect and feel connected to.\n\nWishing you a very Happy Birthday, Amol Kaka! Stay blessed and keep spreading the same warmth and kindness always.",
+    sig: "— Vaishnavi Deshpande",
+    doodle: "♡ ♡ ♡"
+},
+{
+    text: "Amol Kaka,\n\nYou are the kind of person who is always there for everyone. Strong enough to be the family’s backbone, but understanding enough to know when someone needs support without having to say much.\n\nYou can be a little strict and completely bindass, but that’s also what makes you you. For me, you have always been someone I can turn to whenever I’m confused, stuck, or simply need to talk.\n\nEven though we may be far apart, you have always been one of the closest people to my heart. We’ve shared so many memories, and there are things I could never properly put into words.\n\nI may not say it often, but having you in my life means a lot to me.\n\nHappy Birthday, Amol Kaka. Stay exactly the way you are.",
+    sig: "- Harshvardhan Deshpande",
+    doodle: ""
+},
+{
+    text: "To the man who deals with my sister and still smiles. Happy birthday Amol. Wishing you happy years ahead filled with good health, happiness and success in everything you do.",
+    sig: "— Rajni Chaturvedi",
+    doodle: ""
+},
+{
+    text: "Amol Kaka, wonderful personality! Always motivates me to work towards my goals. Your positivity and guidance inspire me to keep pushing forward and become a better version of myself.",
+    sig: "— Ninad",
+    doodle: ""
+},
+{
+    text: "Some people become family by relation, and some become family through the love they give.\n\nOver the years, your warmth, kindness and the way you make everyone feel at home have made you so much more than just family.\n\nI am truly lucky to have you in my life.\n\nWishing you good health, happiness and many more beautiful years ahead.\n\nHappy Birthday!!",
+    sig: "— Aadhar Chaturvedi",
+    doodle: ""
+},
+{
+    text: "Happy Birthday to the brother I got by chance and the bond I am lucky to have. Stay awesome, stay blessed, and keep shining!",
+    sig: "— Jyoti Chaturvedi",
+    doodle: ""
+},
+{
+    font: "kalam",
+    text: "आदरणीय अमोल भाऊजी, वाढदिवसाच्या हार्दिक शुभेच्छा!\n\n\"घराचा आधार आणि आम्हा सर्वांचे मार्गदर्शक असलेल्या तुम्हाला निरोगी आयुष्य, सुख आणि भरपूर यश लाभो\" अमोल भाऊजी, तुम्ही फक्त दीर नाही तर मोठ्या भावासारखे आहात.\n\nतुमच्या प्रेमळ स्वभावामुळे घराला वेगळीच शोभा आहे. वाढदिवसाच्या खूप खूप शुभेच्छा!",
+    sig: "— Sheetal Deshpande",
+    doodle: ""
+},
+{
+    text: "Happy Birthday, Mausaji!\n\nWishing you a very happy birthday filled with good health, happiness, love, and countless beautiful moments. May you always keep smiling and may this year bring you lots of joy and success.\n\nYour warmth, kindness, and loving nature make you truly special to our family.\n\nHave a wonderful birthday and a fantastic year ahead!",
+    sig: "— Akshita Chaturvedi",
+    doodle: ""
+},
+{
+    text: "Sometimes sweet, sometimes strict, but always kind at heart.\nA wonderful uncle whose care, and love make him truly special.",
+    sig: "— Amey Deshpande",
+    doodle: ""
+},
+{
+    text: "Happy Birthday Amol Kaka! Wishing you a very happy and healthy birthday! Hope you have a great year ahead!",
+    sig: "— Prannay Deshpande",
+    doodle: "♡ ♡ ♡"
+},
+{
+    text: "Thank you for always being someone I can count on for great advice, steady support, and wonderful memories. Wishing you a year ahead filled with good health, lots of happiness, and everything you enjoy most. Hope your day is as fantastic as you are!",
+    sig: "- Ajinkya Deshpande",
+    doodle: ""
+},
+{
+    text: "Dear Mausa Ji, you deserve the best life has to offer. May God fulfill all your wishes and shower you with good health, peace, and long life. Thank you for your love and support like a father.",
+    sig: "- Kavita Chaturvedi",
+    doodle: ""
+},
+{
+    text: "Dear Amol kaka,\n\nSome relationships are created by family, but with time, they become relationships of the heart. My relationship with you is truly one of them.\n\nFrom the day I became a part of this family, you welcomed me with warmth, affection, and a sense of belonging. You never made me feel like an outsider; instead, you made me feel like your own daughter. That is something I will always treasure.\n\nWhat I admire most about you is the love and care you have for your family. You may not always express everything through words, but your actions speak louder than anything else. The happiness and togetherness of the family are clearly a reflection of the beautiful person you are.\n\nI feel truly blessed to have you not only as my father-in-law, but as a father, a guide, and someone I can always look up to.\n\nMay you always be blessed with good health, peace, happiness, and countless beautiful moments with everyone who loves you.\n\nKeep smiling, kaka, and continue to bless us with your love. You will always have a very special place in my heart.",
+    sig: "- With lots of love and respect, Renu Deshpande",
+    doodle: ""
+},
+{
+    text: "Hello mausaji!! Happy happy birthday <3 Thanks for all the fun chats (and occasional fights hahaha) about food, history and politics. I actually quite enjoy them.",
+    sig: "— Mita Chaturvedi",
+    doodle: ""
+},
+{
+    text: "Happy Birthday Amol Kaka. Always thankful for your evergreen guidance and blessings.",
+    sig: "— Kaivalya Deshpande",
+    doodle: ""
+},
+{
+    text: "Happy birthday mausa ji! Thank you for being so kind and like a father figure to me! I love spending time with you and I’m so happy to finally see you again in Dec!!",
+    sig: "— Noya",
+    doodle: ""
+}
+        ];
+
+        let TOTAL = NOTES.length;
+        let current = 1;
+
+        // Auto-generate HTML pages from the NOTES array
+        function renderNotes() {
+            const container = document.getElementById('pages-container');
+            container.innerHTML = '';
+            
+            NOTES.forEach((note, index) => {
+                const pageNum = index + 1;
+                const isActive = pageNum === 1 ? 'active' : '';
+                
+                let contentHTML = ``;
+                if (note.from) contentHTML += `<div class="p-from">${note.from}</div>`;
+                if (note.date) contentHTML += `<div class="p-date">${note.date}</div>`;
+                if (note.text) contentHTML += `<p class="p-body">${note.text}</p>`;
+                if (note.sig) contentHTML += `<div class="p-sig">${note.sig}</div>`;
+                if (note.doodle) contentHTML += `<div class="p-doodle">${note.doodle}</div>`;
+                if (note.divider) contentHTML += `<div class="p-divider">${note.divider}</div>`;
+                if (note.closing) contentHTML += `<div class="p-closing">${note.closing}</div>`;
+
+                container.innerHTML += `
+                    <div class="page ${isActive}" data-p="${pageNum}">
+                        <div class="page-content">
+                            ${contentHTML}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            TOTAL = NOTES.length;
+            updateUI();
+        }
+
+        // Run on load
+        document.addEventListener('DOMContentLoaded', renderNotes);
+
+        /* ---- OPEN BOOK with swoosh ---- */
+        function openBook() {
+            // Disable button to prevent double-tap
+            document.getElementById('tap-btn').disabled = true;
+
+            // Swoosh the cover away
+            document.getElementById('cover-screen').classList.add('swoosh-away');
+
+            // Reveal notebook after a short delay (matches transition timing)
+            setTimeout(() => {
+                document.getElementById('notebook-screen').classList.add('visible');
+            }, 300);
+        }
+
+        /* ---- PAGE NAVIGATION ---- */
+        function goTo(num) {
+            const pages = document.querySelectorAll('.page');
+
+            // Mark current as exiting
+            const currentEl = document.querySelector(`.page[data-p="${current}"]`);
+            if (currentEl) {
+                currentEl.classList.remove('active');
+                if (num > current) {
+                    currentEl.classList.add('exit-left');
+                } else {
+                    // Going backwards: exit to the right
+                    currentEl.style.transform = 'rotateY(90deg)';
+                    currentEl.style.opacity = '0';
+                }
+            }
+
+            // After transition, activate new page
+            setTimeout(() => {
+                // Reset all pages
+                pages.forEach(p => {
+                    p.classList.remove('active', 'exit-left');
+                    p.style.transform = '';
+                    p.style.opacity = '';
+                });
+
+                const next = document.querySelector(`.page[data-p="${num}"]`);
+                if (next) {
+                    // Flip in from correct direction
+                    if (num > current) {
+                        next.style.transform = 'rotateY(90deg)';
+                    } else {
+                        next.style.transform = 'rotateY(-90deg)';
+                    }
+                    next.style.opacity = '0';
+
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            next.classList.add('active');
+                            next.style.transform = '';
+                            next.style.opacity = '';
+                            next.scrollTop = 0;
+                        });
+                    });
+                }
+
+                current = num;
+                updateUI();
+            }, 320);
+        }
+
+        function updateUI() {
+            document.getElementById('counter').textContent = `${current} / ${TOTAL}`;
+            document.getElementById('btn-prev').disabled = (current <= 1);
+            document.getElementById('btn-next').disabled = (current >= TOTAL);
+        }
+
+        function prevPage() { if (current > 1) goTo(current - 1); }
+        function nextPage() { if (current < TOTAL) goTo(current + 1); }
+
+        // Keyboard nav
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft')  prevPage();
+        });
+
+        // Swipe support for mobile
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].clientX;
+        }, { passive: true });
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextPage();
+                else prevPage();
+            }
+        }, { passive: true });
+    </script>
+</body>
+</html>
